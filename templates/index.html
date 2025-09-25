@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% block content %}
 <section class="controls">
@@ -66,10 +65,15 @@
         {% endfor %}
       </ul>
     {% else %}
-      <div class="grid">
+      <!-- ✅ Updated Grid Layout -->
+      <div class="cards-grid">
         {% for a in articles %}
         <article class="card">
-          {% if a.image %}<img class="thumb" src="{{ a.image }}" alt="">{% endif %}
+          {% if a.image %}
+            <figure class="card-cover">
+              <img src="{{ a.image }}" alt="{{ a.title }}">
+            </figure>
+          {% endif %}
           <a class="title" href="{{ a.link }}" target="_blank">{{ a.title }}</a>
           <p class="summary">{{ a.summary|safe }}</p>
           <div class="meta">
