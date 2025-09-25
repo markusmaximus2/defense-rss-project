@@ -27,28 +27,31 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="footer">
-    <p>© 2025 DefenseNewsUpdate.com — Aggregated Defense News</p>
+ <!doctype html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DefenseNewsUpdate</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=11">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <div class="brand">DefenseNewsUpdate.com</div>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      © 2025 DefenseNewsUpdate.com — Aggregated Defense News
+    </div>
   </footer>
-
-  <script>
-  // Dark mode toggle
-  const root = document.documentElement;
-  try {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') root.classList.add('dark');
-    document.getElementById('themeToggle')?.addEventListener('click', () => {
-      root.classList.toggle('dark');
-      localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
-    });
-  } catch (e) {}
-
-  // Hamburger menu toggle
-  const hb = document.getElementById('hamburger');
-  const nav = document.querySelector('.nav');
-  hb?.addEventListener('click', () => {
-    nav.classList.toggle('active');
-  });
-  </script>
 </body>
 </html>

@@ -1,58 +1,86 @@
 [
   {
     "name": "Defense News",
-    "url": "https://www.defensenews.com/arc/outboundfeeds/rss/?outputType=xml"
+    "url": "https://www.defensenews.com/arc/outboundfeeds/rss/?outputType=xml",
+    "region": "americas",
+    "domain": "general"
   },
   {
     "name": "Military Times",
-    "url": "https://www.militarytimes.com/arc/outboundfeeds/rss/?outputType=xml"
+    "url": "https://www.militarytimes.com/arc/outboundfeeds/rss/?outputType=xml",
+    "region": "americas",
+    "domain": "general"
   },
   {
     "name": "Army Times",
-    "url": "https://www.armytimes.com/arc/outboundfeeds/rss/?outputType=xml"
+    "url": "https://www.armytimes.com/arc/outboundfeeds/rss/?outputType=xml",
+    "region": "americas",
+    "domain": "land"
   },
   {
     "name": "Navy Times",
-    "url": "https://www.navytimes.com/arc/outboundfeeds/rss/?outputType=xml"
+    "url": "https://www.navytimes.com/arc/outboundfeeds/rss/?outputType=xml",
+    "region": "americas",
+    "domain": "sea"
   },
   {
     "name": "Air Force Times",
-    "url": "https://www.airforcetimes.com/arc/outboundfeeds/rss/?outputType=xml"
+    "url": "https://www.airforcetimes.com/arc/outboundfeeds/rss/?outputType=xml",
+    "region": "americas",
+    "domain": "air"
   },
   {
     "name": "DSCA (Defense Security Cooperation Agency)",
-    "url": "https://www.dsca.mil/rss"
+    "url": "https://www.dsca.mil/rss",
+    "region": "americas",
+    "domain": "policy"
   },
   {
     "name": "DVIDS News",
-    "url": "https://www.dvidshub.net/rss/news"
+    "url": "https://www.dvidshub.net/rss/news",
+    "region": "americas",
+    "domain": "general"
   },
   {
     "name": "Defence Blog",
-    "url": "https://defence-blog.com/feed/"
+    "url": "https://defence-blog.com/feed/",
+    "region": "global",
+    "domain": "general"
   },
   {
     "name": "Defense One",
-    "url": "https://www.defenseone.com/rss/all/"
+    "url": "https://www.defenseone.com/rss/all/",
+    "region": "americas",
+    "domain": "general"
   },
   {
     "name": "UK Defence Journal",
-    "url": "https://ukdefencejournal.org.uk/feed/"
+    "url": "https://ukdefencejournal.org.uk/feed/",
+    "region": "europe",
+    "domain": "general"
   },
   {
     "name": "EURACTIV Defence",
-    "url": "https://www.euractiv.com/section/defence-security/feed/"
+    "url": "https://www.euractiv.com/section/defence-security/feed/",
+    "region": "europe",
+    "domain": "policy"
   },
   {
     "name": "European Security & Defence",
-    "url": "https://euro-sd.com/feed/"
+    "url": "https://euro-sd.com/feed/",
+    "region": "europe",
+    "domain": "industry"
   },
   {
     "name": "ES&T (Germany)",
-    "url": "https://esut.de/feed/"
+    "url": "https://esut.de/feed/",
+    "region": "europe",
+    "domain": "industry"
   },
   {
     "name": "Meta-Defense (France)",
-    "url": "https://meta-defense.fr/feed/"
+    "url": "https://meta-defense.fr/feed/",
+    "region": "europe",
+    "domain": "analysis"
   }
 ]
