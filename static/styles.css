@@ -84,11 +84,12 @@ form.filters button:hover {
   background: #1e40af;
 }
 
-/* Articles grid */
-.grid {
+/* Articles grid - fix alignment */
+.main .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
+  width: 100%;
 }
 
 /* Article cards */
