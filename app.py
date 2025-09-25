@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, send_file
-import feedparser, json, time, math, re, os, requests
+import feedparser, json, time, math, re, io
 from collections import Counter
-from io import BytesIO
 from PIL import Image, ImageOps
-from urllib.parse import quote_plus
+import requests
+import urllib.parse
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # prevent static caching
@@ -11,24 +11,6 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # prevent static caching
 DOMAINS = ["land", "air", "sea", "space", "cyber"]
 REGIONS = ["europe", "asia", "middle-east", "americas", "africa"]
 
-THUMB_DIR = "thumb_cache"
-os.makedirs(THUMB_DIR, exist_ok=True)
-
-# ------------------ Custom Filters ------------------
-@app.template_filter("ue")
-def urlencode_filter(s):
-    """Jinja2 filter to safely URL-encode parameters"""
-    return quote_plus(s or "")
-
-@app.template_filter('datetimeformat')
-def datetimeformat(value):
-    import datetime
-    try:
-        return datetime.datetime.fromtimestamp(value).strftime('%Y-%m-%d %H:%M') if value else ''
-    except Exception:
-        return ''
-
-# ------------------ Feed Handling ------------------
 def load_feeds():
     with open("feeds.json", "r", encoding="utf-8") as f:
         return json.load(f)
@@ -42,7 +24,6 @@ def fetch_articles():
         except Exception:
             continue
         for entry in d.entries:
-            # published timestamp
             published_ts = None
             if getattr(entry, "published_parsed", None):
                 try:
@@ -50,7 +31,6 @@ def fetch_articles():
                 except Exception:
                     published_ts = None
 
-            # image extraction
             image = None
             if getattr(entry, "media_content", None):
                 try:
@@ -76,8 +56,6 @@ def fetch_articles():
                 "published": published_ts,
                 "image": image or ""
             })
-
-    # newest first
     articles.sort(key=lambda x: x["published"] or 0, reverse=True)
     return articles
 
@@ -102,12 +80,36 @@ def compute_trends(articles, top_n=10):
     word_counts = Counter(words).most_common(top_n)
     return top_sources, word_counts
 
-# ------------------ Routes ------------------
+@app.template_filter('datetimeformat')
+def datetimeformat(value):
+    import datetime
+    try:
+        return datetime.datetime.fromtimestamp(value).strftime('%Y-%m-%d %H:%M') if value else ''
+    except Exception:
+        return ''
+
+@app.route("/thumb")
+def thumb():
+    url = request.args.get("u")
+    w = int(request.args.get("w", 500))
+    h = int(request.args.get("h", 500))
+    if not url:
+        return "", 404
+    try:
+        r = requests.get(url, timeout=5)
+        img = Image.open(io.BytesIO(r.content)).convert("RGB")
+        img = ImageOps.fit(img, (w, h), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG")
+        buf.seek(0)
+        return send_file(buf, mimetype="image/jpeg")
+    except Exception:
+        return "", 404
+
 @app.route("/")
 def index():
     articles = fetch_articles()
 
-    # Query params
     q = (request.args.get("q") or "").strip().lower()
     region = (request.args.get("region") or "").strip().lower()
     domain = (request.args.get("domain") or "").strip().lower()
@@ -121,19 +123,21 @@ def index():
     def matches(a):
         text = (a["title"] + " " + a["summary"]).lower()
         ok = True
-        if q: ok = ok and (q in text)
-        if region: ok = ok and (region in text)
-        if domain: ok = ok and (domain in text)
-        if source: ok = ok and (source == a["source"].lower())
+        if q:
+            ok = ok and (q in text)
+        if region:
+            ok = ok and (region in text)
+        if domain:
+            ok = ok and (domain in text)
+        if source:
+            ok = ok and (source == a["source"].lower())
         return ok
 
     filtered = [a for a in articles if matches(a)]
     total = len(filtered)
 
-    # sidebar trends
     top_sources, top_keywords = compute_trends(filtered)
 
-    # Pagination
     pages = max(1, math.ceil(total / per_page))
     page = min(max(1, page), pages)
     start = (page - 1) * per_page
@@ -155,34 +159,14 @@ def index():
         sources=all_sources,
         top_sources=top_sources,
         top_keywords=top_keywords,
-        total=total
+        total=total,
+        urlencode=urllib.parse.quote_plus
     )
 
 @app.route("/feeds")
 def feeds_page():
     return render_template("feeds.html", feeds=load_feeds())
 
-@app.route("/thumb")
-def thumb():
-    url = request.args.get("u", "")
-    w = int(request.args.get("w", 500))
-    h = int(request.args.get("h", 500))
-    if not url:
-        return "", 404
-    key = f"{quote_plus(url)}_{w}x{h}.jpg"
-    path = os.path.join(THUMB_DIR, key)
-    if os.path.exists(path):
-        return send_file(path, mimetype="image/jpeg")
-    try:
-        r = requests.get(url, timeout=5, stream=True)
-        r.raise_for_status()
-        im = Image.open(r.raw).convert("RGB")
-        im = ImageOps.fit(im, (w, h), Image.LANCZOS)
-        im.save(path, "JPEG", quality=80)
-        return send_file(path, mimetype="image/jpeg")
-    except Exception:
-        return "", 404
 
-# ------------------ Main ------------------
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+
+
