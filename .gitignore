@@ -1,6 +1,32 @@
+# Python cache
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment
+.env
+.venv/
+venv/
+ENV/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build / packaging
+*.egg-info/
+dist/
+build/
+
+# Local cache
 thumb_cache/
-*.txt
-__pycache__/
-thumb_cache/
+
+# Logs
+*.log
+
+# Temporary files
+*.swp
+*.bak
+*.tmp
 *.txt
