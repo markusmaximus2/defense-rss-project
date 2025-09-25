@@ -34,5 +34,25 @@
   {
     "name": "Defense One",
     "url": "https://www.defenseone.com/rss/all/"
+  },
+  {
+    "name": "UK Defence Journal",
+    "url": "https://ukdefencejournal.org.uk/feed/"
+  },
+  {
+    "name": "EURACTIV Defence",
+    "url": "https://www.euractiv.com/section/defence-security/feed/"
+  },
+  {
+    "name": "European Security & Defence",
+    "url": "https://euro-sd.com/feed/"
+  },
+  {
+    "name": "ES&T (Germany)",
+    "url": "https://esut.de/feed/"
+  },
+  {
+    "name": "Meta-Defense (France)",
+    "url": "https://meta-defense.fr/feed/"
   }
 ]
