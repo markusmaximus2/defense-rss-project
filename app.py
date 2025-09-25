@@ -6,7 +6,7 @@ from PIL import Image, ImageOps
 from urllib.parse import quote_plus
 
 app = Flask(__name__)
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # prevent static caching
 
 DOMAINS = ["land", "air", "sea", "space", "cyber"]
 REGIONS = ["europe", "asia", "middle-east", "americas", "africa"]
@@ -14,12 +14,21 @@ REGIONS = ["europe", "asia", "middle-east", "americas", "africa"]
 THUMB_DIR = "thumb_cache"
 os.makedirs(THUMB_DIR, exist_ok=True)
 
-# ---------- Jinja Filter ----------
+# ------------------ Custom Filters ------------------
 @app.template_filter("ue")
 def urlencode_filter(s):
+    """Jinja2 filter to safely URL-encode parameters"""
     return quote_plus(s or "")
 
-# ---------- Feed Parsing ----------
+@app.template_filter('datetimeformat')
+def datetimeformat(value):
+    import datetime
+    try:
+        return datetime.datetime.fromtimestamp(value).strftime('%Y-%m-%d %H:%M') if value else ''
+    except Exception:
+        return ''
+
+# ------------------ Feed Handling ------------------
 def load_feeds():
     with open("feeds.json", "r", encoding="utf-8") as f:
         return json.load(f)
@@ -33,12 +42,15 @@ def fetch_articles():
         except Exception:
             continue
         for entry in d.entries:
+            # published timestamp
             published_ts = None
             if getattr(entry, "published_parsed", None):
                 try:
                     published_ts = time.mktime(entry.published_parsed)
                 except Exception:
-                    pass
+                    published_ts = None
+
+            # image extraction
             image = None
             if getattr(entry, "media_content", None):
                 try:
@@ -64,6 +76,8 @@ def fetch_articles():
                 "published": published_ts,
                 "image": image or ""
             })
+
+    # newest first
     articles.sort(key=lambda x: x["published"] or 0, reverse=True)
     return articles
 
@@ -73,6 +87,7 @@ def normalize(text):
 def compute_trends(articles, top_n=10):
     source_counts = Counter(a["source"] for a in articles)
     top_sources = source_counts.most_common(8)
+
     stop = set("""
     a an the and or of to for with in on at from by as is are was were will would should could can may might 
     about after before over under into out up down new more most other some any each few best top vs amid 
@@ -80,24 +95,19 @@ def compute_trends(articles, top_n=10):
     air land sea space cyber asia europe americas africa middle east forces defense military armed army navy 
     airforce air-force spaceforce space-force
     """.split())
+
     words = []
     for a in articles:
         words += [w for w in normalize(a["title"]).split() if len(w) > 3 and w not in stop]
     word_counts = Counter(words).most_common(top_n)
     return top_sources, word_counts
 
-@app.template_filter('datetimeformat')
-def datetimeformat(value):
-    import datetime
-    try:
-        return datetime.datetime.fromtimestamp(value).strftime('%Y-%m-%d %H:%M') if value else ''
-    except Exception:
-        return ''
-
-# ---------- Routes ----------
+# ------------------ Routes ------------------
 @app.route("/")
 def index():
     articles = fetch_articles()
+
+    # Query params
     q = (request.args.get("q") or "").strip().lower()
     region = (request.args.get("region") or "").strip().lower()
     domain = (request.args.get("domain") or "").strip().lower()
@@ -120,8 +130,10 @@ def index():
     filtered = [a for a in articles if matches(a)]
     total = len(filtered)
 
+    # sidebar trends
     top_sources, top_keywords = compute_trends(filtered)
 
+    # Pagination
     pages = max(1, math.ceil(total / per_page))
     page = min(max(1, page), pages)
     start = (page - 1) * per_page
@@ -171,5 +183,6 @@ def thumb():
     except Exception:
         return "", 404
 
+# ------------------ Main ------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
