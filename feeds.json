@@ -1,10 +1,38 @@
 [
   {
     "name": "Defense News",
-    "url": "https://www.defensenews.com/arc/outboundfeeds/rss/"
+    "url": "https://www.defensenews.com/arc/outboundfeeds/rss/?outputType=xml"
   },
   {
-    "name": "Breaking Defense",
-    "url": "https://breakingdefense.com/feed/"
+    "name": "Military Times",
+    "url": "https://www.militarytimes.com/arc/outboundfeeds/rss/?outputType=xml"
+  },
+  {
+    "name": "Army Times",
+    "url": "https://www.armytimes.com/arc/outboundfeeds/rss/?outputType=xml"
+  },
+  {
+    "name": "Navy Times",
+    "url": "https://www.navytimes.com/arc/outboundfeeds/rss/?outputType=xml"
+  },
+  {
+    "name": "Air Force Times",
+    "url": "https://www.airforcetimes.com/arc/outboundfeeds/rss/?outputType=xml"
+  },
+  {
+    "name": "DSCA (Defense Security Cooperation Agency)",
+    "url": "https://www.dsca.mil/rss"
+  },
+  {
+    "name": "DVIDS News",
+    "url": "https://www.dvidshub.net/rss/news"
+  },
+  {
+    "name": "Defence Blog",
+    "url": "https://defence-blog.com/feed/"
+  },
+  {
+    "name": "Defense One",
+    "url": "https://www.defenseone.com/rss/all/"
   }
 ]
