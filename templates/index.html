@@ -1,130 +1,80 @@
 {% extends 'base.html' %}
+{% block filters %}
+<form method="get" action="/" class="filters">
+  <input type="text" name="q" placeholder="Search news..." value="{{ q or '' }}">
+  <label>Region:
+    <select name="region">
+      <option value="">All</option>
+      {% for r in regions %}
+      <option value="{{ r }}" {% if region==r %}selected{% endif %}>{{ r.replace('-', ' ').title() }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Domain:
+    <select name="domain">
+      <option value="">All</option>
+      {% for d in domains %}
+      <option value="{{ d }}" {% if domain==d %}selected{% endif %}>{{ d.title() }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Source:
+    <select name="source">
+      <option value="">All</option>
+      {% for s in sources %}
+      <option value="{{ s }}" {% if source==s.lower() %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>View:
+    <select name="view">
+      <option value="grid" {% if view=='grid' %}selected{% endif %}>Grid</option>
+      <option value="list" {% if view=='list' %}selected{% endif %}>Timeline</option>
+    </select>
+  </label>
+  <button class="btn-primary" type="submit">Apply</button>
+  <a class="btn" href="/">Clear</a>
+</form>
+{% endblock %}
+
 {% block content %}
-<section class="controls">
-  <form method="get" action="/" class="filters">
-    <input type="text" name="q" placeholder="Search news..." value="{{ q or '' }}">
-    <label>Region:
-      <select name="region">
-        <option value="">All</option>
-        {% for r in regions %}
-        <option value="{{ r }}" {% if region==r %}selected{% endif %}>{{ r.replace('-', ' ').title() }}</option>
-        {% endfor %}
-      </select>
-    </label>
-    <label>Domain:
-      <select name="domain">
-        <option value="">All</option>
-        {% for d in domains %}
-        <option value="{{ d }}" {% if domain==d %}selected{% endif %}>{{ d.title() }}</option>
-        {% endfor %}
-      </select>
-    </label>
-    <label>Source:
-      <select name="source">
-        <option value="">All</option>
-        {% for s in sources %}
-        <option value="{{ s }}" {% if source==s.lower() %}selected{% endif %}>{{ s }}</option>
-        {% endfor %}
-      </select>
-    </label>
-    <label>View:
-      <select name="view">
-        <option value="grid" {% if view=='grid' %}selected{% endif %}>Grid</option>
-        <option value="list" {% if view=='list' %}selected{% endif %}>Timeline</option>
-      </select>
-    </label>
-    <button class="btn-primary" type="submit">Apply</button>
-    <a class="btn" href="/">Clear</a>
-  </form>
-
-  {% if q or region or domain or source %}
-  <div class="badges">
-    {% if q %}<a class="badge purple" href="/?region={{ region }}&domain={{ domain }}&source={{ source }}&view={{ view }}">Search: {{ q }} ✕</a>{% endif %}
-    {% if region %}<a class="badge blue" href="/?q={{ q }}&domain={{ domain }}&source={{ source }}&view={{ view }}">Region: {{ region }} ✕</a>{% endif %}
-    {% if domain %}<a class="badge green" href="/?q={{ q }}&region={{ region }}&source={{ source }}&view={{ view }}">Domain: {{ domain }} ✕</a>{% endif %}
-    {% if source %}<a class="badge" style="background:#fee2e2;color:#991b1b" href="/?q={{ q }}&region={{ region }}&domain={{ domain }}&view={{ view }}">Source: {{ source }} ✕</a>{% endif %}
-  </div>
+<div class="main">
+  {% if view == 'list' %}
+    <ul class="timeline">
+      {% for a in articles %}
+      <li class="card list">
+        <div class="meta">
+          {% if a.published %}<span>{{ a.published|datetimeformat }}</span>{% endif %}
+          <span>• {{ a.source }}</span>
+        </div>
+        <a class="title" href="{{ a.link }}" target="_blank">{{ a.title }}</a>
+        {% if a.image %}
+          <img class="thumb" src="/thumb?u={{ a.image|ue }}&w=300&h=200" alt="">
+        {% endif %}
+        <p class="summary">{{ a.summary|safe }}</p>
+        <a class="more" href="{{ a.link }}" target="_blank">Read More →</a>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="cards-grid">
+      {% for a in articles %}
+      <article class="card">
+        {% if a.image %}
+          <figure class="card-cover">
+            <img src="/thumb?u={{ a.image|ue }}&w=500&h=500" alt="{{ a.title }}">
+          </figure>
+        {% endif %}
+        <a class="title" href="{{ a.link }}" target="_blank">{{ a.title }}</a>
+        <p class="summary">{{ a.summary|safe }}</p>
+        <div class="meta">
+          <span>{{ a.source }}</span>
+          {% if a.published %}<span>• {{ a.published|datetimeformat }}</span>{% endif %}
+        </div>
+        <a class="more" href="{{ a.link }}" target="_blank">Read More →</a>
+      </article>
+      {% endfor %}
+    </div>
   {% endif %}
-</section>
-
-<section class="layout">
-  <div class="main">
-    {% if view == 'list' %}
-      <ul class="timeline">
-        {% for a in articles %}
-        <li class="card list">
-          <div class="meta">
-            {% if a.published %}<span>{{ a.published|datetimeformat }}</span>{% endif %}
-            <span>• {{ a.source }}</span>
-          </div>
-          <a class="title" href="{{ a.link }}" target="_blank">{{ a.title }}</a>
-          {% if a.image %}<img class="thumb" src="{{ a.image }}" alt="">{% endif %}
-          <p class="summary">{{ a.summary|safe }}</p>
-          <a class="more" href="{{ a.link }}" target="_blank">Read More →</a>
-        </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <!-- ✅ Updated Grid Layout -->
-      <div class="cards-grid">
-        {% for a in articles %}
-        <article class="card">
-          {% if a.image %}
-            <figure class="card-cover">
-              <img src="{{ a.image }}" alt="{{ a.title }}">
-            </figure>
-          {% endif %}
-          <a class="title" href="{{ a.link }}" target="_blank">{{ a.title }}</a>
-          <p class="summary">{{ a.summary|safe }}</p>
-          <div class="meta">
-            <span>{{ a.source }}</span>
-            {% if a.published %}<span>• {{ a.published|datetimeformat }}</span>{% endif %}
-          </div>
-          <a class="more" href="{{ a.link }}" target="_blank">Read More →</a>
-        </article>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <div class="pagination">
-      {% if page > 1 %}
-      <a href="?page={{ page-1 }}&q={{ q }}&region={{ region }}&domain={{ domain }}&source={{ source }}&view={{ view }}">← Prev</a>
-      {% endif %}
-      <span>Page {{ page }} of {{ pages }} ({{ total }} results)</span>
-      {% if page < pages %}
-      <a href="?page={{ page+1 }}&q={{ q }}&region={{ region }}&domain={{ domain }}&source={{ source }}&view={{ view }}">Next →</a>
-      {% endif %}
-    </div>
-  </div>
-
-  <aside class="sidebar">
-    <div class="widget">
-      <h3>Categories</h3>
-      <div class="tabs">
-        <a class="tab {% if domain=='' %}active{% endif %}" href="/?q={{ q }}&region={{ region }}&source={{ source }}&view={{ view }}">All</a>
-        {% for d in domains %}
-        <a class="tab {% if domain==d %}active{% endif %}" href="/?domain={{ d }}&q={{ q }}&region={{ region }}&source={{ source }}&view={{ view }}">{{ d.title() }}</a>
-        {% endfor %}
-      </div>
-    </div>
-
-    <div class="widget">
-      <h3>Trending Sources</h3>
-      <ul class="list">
-        {% for name, count in top_sources %}
-        <li><span class="count">{{ count }}</span> {{ name }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="widget">
-      <h3>Trending Keywords</h3>
-      <div class="keywords">
-        {% for word, count in top_keywords %}
-        <a class="kw" href="/?q={{ word }}&region={{ region }}&domain={{ domain }}&source={{ source }}&view={{ view }}">{{ word }}</a>
-        {% endfor %}
-      </div>
-    </div>
-  </aside>
-</section>
+</div>
 {% endblock %}
