@@ -1,0 +1,55 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DefenseNewsUpdate</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=8">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <div class="brand"><a href="/">DefenseNewsUpdate.com</a></div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/feeds">Feeds</a>
+        <a href="/about">About</a>
+      </nav>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button id="themeToggle" class="toggle" title="Toggle dark mode">🌙</button>
+        <button id="hamburger" class="hamburger" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    © 2025 DefenseNewsUpdate.com — Aggregated Defense News
+  </footer>
+
+  <script>
+  // Dark mode
+  const root = document.documentElement;
+  try {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') root.classList.add('dark');
+    document.getElementById('themeToggle')?.addEventListener('click', () => {
+      root.classList.toggle('dark');
+      localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
+    });
+  } catch (e) {}
+
+  // Hamburger toggle
+  const hb = document.getElementById('hamburger');
+  const nav = document.querySelector('.nav');
+  hb?.addEventListener('click', () => {
+    nav.classList.toggle('active');
+  });
+  </script>
+</body>
+</html>

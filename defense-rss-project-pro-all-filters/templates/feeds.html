@@ -1,0 +1,13 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<section class="page">
+  <h2>Feed Sources</h2>
+  <p>These RSS feeds are aggregated:</p>
+  <ul class="list">
+    {% for f in feeds %}
+    <li><a href="{{ f.url }}" target="_blank">{{ f.name }}</a></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
